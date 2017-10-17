@@ -2,7 +2,8 @@
 
 include 'db.php';
 
- if (isset($_SERVER['HTTP_ORIGIN'])) {
+
+    if (isset($_SERVER['HTTP_ORIGIN'])) {
         header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Max-Age: 86400');    // cache for 1 day
@@ -19,25 +20,30 @@ include 'db.php';
  
         exit(0);
     }
-
-     $postdata = file_get_contents("php://input");
+ 
+ 
+    $postdata = file_get_contents("php://input");
     if (isset($postdata)) {
         $request = json_decode($postdata);
-        $id = $request->id;
+        $clubid = $request->id;
+
+        $sql = "SELECT * FROM club_members WHERE club_id='$clubid'";
+        $result = mysqli_query($conn,$sql);     
+        $members = array();
+
+        while($row = mysqli_fetch_assoc($result)){
+            $members[] = $row;
+        }
+
+        echo json_encode($members);
         
-        $sql = "SELECT details_clubs.*,clubs.id as 'clubid',clubs.name,clubs.advisor,clubs.description,clubs.image, COUNT(club_members.club_id) AS amt,COUNT(activity.club_id) AS actamt FROM `clubs` 
-        INNER JOIN details_clubs ON details_clubs.clubid = clubs.id
-        LEFT JOIN club_members ON clubs.id = club_members.club_id  
-        LEFT JOIN activity ON clubs.id = activity.club_id
-        WHERE clubs.id = '$id'";
-        $result = mysqli_query($conn,$sql);
 
-        $row = mysqli_fetch_assoc($result);
-
-        echo json_encode($row);
-
-
+       
     }
+    else {
+        echo "empty";
+    }
+
 
 
 ?>
