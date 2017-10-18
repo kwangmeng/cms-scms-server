@@ -25,22 +25,27 @@ include 'db.php';
     $postdata = file_get_contents("php://input");
     if (isset($postdata)) {
         $request = json_decode($postdata);
-        $comment = $request->comment;
-        $clubid = $request->id;
+        $email =  mysqli_real_escape_string($conn,$request->email);
+        $password= mysqli_real_escape_string($conn,$request->password);
+       
 
-        $sql = "UPDATE details_clubs SET type='rejected' WHERE clubid='$clubid'";
+        $sql = "SELECT * FROM users WHERE email='$email'";
         $result = mysqli_query($conn,$sql);     
-        $time = time();
-  
-        $sql1 = "INSERT INTO comment (comment,clubid,timenow) VALUES ('$comment','$clubid','$time')";
-        $result1 = mysqli_query($conn,$sql1);
-        
-
-        if($result1){
-            echo "good";
+        $row = mysqli_fetch_assoc($result);
+        $rowcount = mysqli_num_rows($result);
+       
+        if($rowcount >= 1){  
+          
+            if($row['password'] == $password && $row['role'] == "admin" && $row['type'] == "active"){
+                echo "good";
+            }else{
+                echo "bad";
+            }
         }else{
             echo "bad";
         }
+
+     
     }
     else {
         echo "empty";

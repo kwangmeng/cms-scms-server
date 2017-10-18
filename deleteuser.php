@@ -25,18 +25,15 @@ include 'db.php';
     $postdata = file_get_contents("php://input");
     if (isset($postdata)) {
         $request = json_decode($postdata);
-        $comment = $request->comment;
-        $clubid = $request->id;
+        $id = $request->id;
+     
 
-        $sql = "UPDATE details_clubs SET type='rejected' WHERE clubid='$clubid'";
+
+        $sql = "UPDATE users SET type='archived' WHERE id='$id'";
         $result = mysqli_query($conn,$sql);     
-        $time = time();
-  
-        $sql1 = "INSERT INTO comment (comment,clubid,timenow) VALUES ('$comment','$clubid','$time')";
-        $result1 = mysqli_query($conn,$sql1);
-        
 
-        if($result1){
+
+        if($result){
             echo "good";
         }else{
             echo "bad";
